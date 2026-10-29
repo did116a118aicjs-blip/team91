@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ทีมช่าง 91</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#12332f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ทีมช่าง 91">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #12332f; color: #eef4f2;
+         font-family: system-ui, -apple-system, "Segoe UI", "Leelawadee UI", Tahoma, sans-serif; text-align: center;
+         padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
+  main { width: 100%; max-width: 420px; }
+  a { color: #f2b705; }
+  h1 { font-size: 20px; margin: 12px 0 4px; }
+  .muted { color: #9fbcb7; font-size: 14px; }
+  .logo { width: 88px; height: 88px; border-radius: 22px; }
+  .card { background: #0d2724; border: 1px solid #1f4a44; border-radius: 16px; padding: 16px; margin-top: 16px; text-align: left; }
+  .card h2 { font-size: 16px; margin: 0 0 10px; color: #f2b705; }
+  ol { margin: 0; padding-left: 22px; line-height: 1.8; }
+  .btn { display: block; width: 100%; border: 0; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700;
+         cursor: pointer; margin-top: 16px; text-decoration: none; text-align: center; font-family: inherit; }
+  .primary { background: #f2b705; color: #1d1600; }
+  .secondary { background: #1b4540; color: #eef4f2; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="icon-192.png" alt="">
+  <h1>ทีมช่างซ่อมบำรุง 91</h1>
+  <p class="muted">แจ้งซ่อม · รับงาน · บันทึกงาน · สรุปผลงานช่าง</p>
+
+  <!-- Normal visit: forward to the server's current address. -->
+  <div id="forward">
+    <p id="msg">กำลังเชื่อมต่อระบบ...</p>
+    <p class="muted" id="hint"></p>
+  </div>
+
+  <!-- ?install: how to put the app on this phone's home screen. -->
+  <div id="install" hidden>
+    <button class="btn primary" id="installBtn" hidden>ติดตั้งแอปทีมช่าง 91</button>
+    <div class="card" id="done" hidden><h2>ติดตั้งเรียบร้อย</h2><p class="muted" style="margin:0">เปิดจากไอคอน “ทีมช่าง 91” บนหน้าจอได้เลย</p></div>
+    <div class="card" id="ios" hidden>
+      <h2>ติดตั้งบน iPhone / iPad</h2>
+      <ol><li>แตะปุ่มแชร์ (Safari อยู่แถบล่าง, Chrome อยู่มุมขวาบน)</li><li>เลือก <b>“เพิ่มไปยังหน้าจอโฮม”</b></li><li>แตะ <b>“เพิ่ม”</b></li></ol>
+    </div>
+    <div class="card" id="android" hidden>
+      <h2 id="androidTitle">ติดตั้งบน Android</h2>
+      <ol><li>แตะเมนู <b>⋮</b> มุมขวาบนของ Chrome</li><li>เลือก <b>“ติดตั้งแอป”</b> หรือ <b>“เพิ่มลงในหน้าจอหลัก”</b></li><li>แตะ <b>“ติดตั้ง”</b></li></ol>
+    </div>
+    <div class="card" id="desktop" hidden><h2>ติดตั้งบนคอมพิวเตอร์</h2><p class="muted" style="margin:0">ใน Chrome หรือ Edge กดไอคอนติดตั้งท้ายช่องที่อยู่เว็บ</p></div>
+    <div class="card" id="inapp" hidden>
+      <h2>เปิดในเบราว์เซอร์ก่อน</h2>
+      <p class="muted" style="margin:0">หน้านี้เปิดอยู่ในแอปแชต ซึ่งติดตั้งไม่ได้ กดเมนูแล้วเลือก “เปิดในเบราว์เซอร์” แล้วทำอีกครั้ง</p>
+      <button class="btn secondary" id="copyBtn">คัดลอกลิงก์</button>
+    </div>
+    <a class="btn secondary" href="./">ไปที่ระบบเลย</a>
+  </div>
+</main>
+<script>
+  var params = new URLSearchParams(location.search);
+  var ua = navigator.userAgent;
+  var standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  var show = function (id, on) { document.getElementById(id).hidden = on === false; };
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+
+  if (params.has('install') && !standalone) {
+    var isIOS = /iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+    var isAndroid = /android/i.test(ua);
+    var inApp = /Line\/|FBAN|FBAV|Instagram|MicroMessenger/i.test(ua);
+    var installUrl = location.origin + location.pathname + '?install';
+    // LINE opens links with this parameter in the phone's own browser.
+    if (/Line\//i.test(ua) && !params.has('openExternalBrowser')) location.replace(installUrl + '&openExternalBrowser=1');
+    history.replaceState(null, '', location.pathname);
+    show('forward', false); show('install');
+    if (inApp) show('inapp'); else if (isIOS) show('ios'); else if (isAndroid) show('android'); else show('desktop');
+    document.getElementById('copyBtn').onclick = function () {
+      var btn = this;
+      navigator.clipboard.writeText(installUrl).then(function () { btn.textContent = 'คัดลอกแล้ว'; }, function () { btn.textContent = installUrl; });
+    };
+    var deferred = null;
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault(); deferred = e; show('installBtn');
+      if (isAndroid) document.getElementById('androidTitle').textContent = 'หรือติดตั้งเองบน Android';
+    });
+    document.getElementById('installBtn').onclick = function () {
+      if (!deferred) return;
+      deferred.prompt();
+      deferred.userChoice.then(function () { deferred = null; show('installBtn', false); });
+    };
+    window.addEventListener('appinstalled', function () { ['installBtn', 'ios', 'android', 'desktop'].forEach(function (id) { show(id, false); }); show('done'); });
+  } else {
+    // The server's public address changes when it restarts; url.json always holds the current one.
+    fetch('url.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var url = data.url;
+        if (!/^https:\/\/[a-z0-9-]+\.trycloudflare\.com\/?$/.test(url)) throw new Error('bad url');
+        var target = new URL(url);
+        target.hash = location.hash;
+        document.getElementById('msg').innerHTML = 'กำลังพาไปที่ระบบ... <a href="' + target.href + '">กดที่นี่ถ้าไม่ไปเอง</a>';
+        location.replace(target.href);
+      })
+      .catch(function () {
+        document.getElementById('msg').textContent = 'ตอนนี้ระบบยังไม่พร้อม (เครื่องเซิร์ฟเวอร์อาจปิดอยู่หรือกำลังเริ่มใหม่)';
+        document.getElementById('hint').textContent = 'กรุณารอสักครู่แล้วโหลดหน้านี้ใหม่';
+      });
+  }
+</script>
+</body>
+</html>
