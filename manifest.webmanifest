@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "ทีมช่างซ่อมบำรุง 91",
+  "short_name": "ทีมช่าง 91",
+  "description": "แจ้งซ่อม รับงาน บันทึกงาน และสรุปผลงานช่าง",
+  "lang": "th",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#12332f",
+  "theme_color": "#12332f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
