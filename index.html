@@ -7,28 +7,28 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="theme-color" content="#12332f">
+<meta name="theme-color" content="#1c1f26">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ทีมช่าง 91">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #12332f; color: #eef4f2;
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #1c1f26; color: #f3f4f6;
          font-family: system-ui, -apple-system, "Segoe UI", "Leelawadee UI", Tahoma, sans-serif; text-align: center;
          padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
   main { width: 100%; max-width: 420px; }
-  a { color: #f2b705; }
+  a { color: #fb923c; }
   h1 { font-size: 20px; margin: 12px 0 4px; }
-  .muted { color: #9fbcb7; font-size: 14px; }
+  .muted { color: #9aa1ad; font-size: 14px; }
   .logo { width: 88px; height: 88px; border-radius: 22px; }
-  .card { background: #0d2724; border: 1px solid #1f4a44; border-radius: 16px; padding: 16px; margin-top: 16px; text-align: left; }
-  .card h2 { font-size: 16px; margin: 0 0 10px; color: #f2b705; }
+  .card { background: #262a33; border: 1px solid #2f3440; border-radius: 16px; padding: 16px; margin-top: 16px; text-align: left; }
+  .card h2 { font-size: 16px; margin: 0 0 10px; color: #fb923c; }
   ol { margin: 0; padding-left: 22px; line-height: 1.8; }
   .btn { display: block; width: 100%; border: 0; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700;
          cursor: pointer; margin-top: 16px; text-decoration: none; text-align: center; font-family: inherit; }
-  .primary { background: #f2b705; color: #1d1600; }
-  .secondary { background: #1b4540; color: #eef4f2; }
+  .primary { background: #ea580c; color: #ffffff; }
+  .secondary { background: #3a3f4b; color: #f3f4f6; }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -72,7 +72,13 @@
   var show = function (id, on) { document.getElementById(id).hidden = on === false; };
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
 
-  if (params.has('install') && !standalone) {
+  // ตั้งแต่ 6 พ.ย. 2569 ระบบอยู่ที่ลิงก์ถาวร workers.dev (iPhone เปิดเป็นแอปเต็มจอได้) ส่งทุกคนไปที่นั่น
+  var APP = 'https://team91.did116a118a-ic-js.workers.dev';
+  if (!params.has('legacy')) {
+    var dest = APP + '/' + (params.has('install') ? '?install' + (params.has('openExternalBrowser') ? '&openExternalBrowser=1' : '') : '') + location.hash;
+    document.getElementById('msg').innerHTML = 'กำลังพาไปที่ระบบ... <a href="' + dest + '">กดที่นี่ถ้าไม่ไปเอง</a>';
+    location.replace(dest);
+  } else if (params.has('install') && !standalone) {
     var isIOS = /iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
     var isAndroid = /android/i.test(ua);
     var inApp = /Line\/|FBAN|FBAV|Instagram|MicroMessenger/i.test(ua);
